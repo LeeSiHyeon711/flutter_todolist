@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:TODO_APP_DEV/component/main_calendar.dart';
 import 'package:TODO_APP_DEV/component/schedule_card.dart';
 import 'package:TODO_APP_DEV/component/today_banner.dart';
+import 'package:TODO_APP_DEV/component/schedule_bottom_sheet.dart';
+import 'package:TODO_APP_DEV/const/colors.dart';
 
 class HomeScreen extends StatefulWidget {
   // StatelessWidget 에서 StatefulWidget으로 전환
@@ -21,6 +23,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: PRIMARY_COLOR,
+        onPressed: () {
+          showModalBottomSheet(
+            context: context, 
+            isDismissible: true, 
+            builder: (_) => ScheduleBottomSheet(),
+          );
+        },
+        child: Icon(
+          Icons.add,
+        ),
+      ),
       body: SafeArea(     // 시스템 UI 피해서 구현하기
         child: Column(    // 달력과 리스트를 세로로 배치치
           children: [
