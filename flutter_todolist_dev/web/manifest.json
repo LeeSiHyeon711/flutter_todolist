@@ -1,11 +1,11 @@
 {
-    "name": "flutter_todolist_dev",
-    "short_name": "flutter_todolist_dev",
+    "name": "TODO_APP_DEV",
+    "short_name": "TODO_APP_DEV",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "TODO_APP_DEV",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
