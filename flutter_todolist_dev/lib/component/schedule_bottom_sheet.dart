@@ -116,6 +116,7 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
   }
   String? timeValidator(String? val) {
     // 시간값 검증
+    // TODO: String? 에서 물음표의 의미 찾아보기
     if (val == null) {
       return '값을 입력해주세요';
     }
