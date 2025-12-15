@@ -4,6 +4,9 @@ import 'package:TODO_APP_DEV/component/custom_text_field.dart';
 import 'package:drift/drift.dart' hide Column;
 import 'package:get_it/get_it.dart';
 import 'package:TODO_APP_DEV/database/drift_database.dart';
+import 'package:TODO_APP_DEV/provider/schedule_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:TODO_APP_DEV/model/schedule_model.dart';
 
 class ScheduleBottomSheet extends StatefulWidget {
   final DateTime selectedDate;
@@ -83,7 +86,7 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
                 width: double.infinity,
                 child: ElevatedButton(
                   // [저장] 버튼
-                  onPressed: onSavePressed,
+                  onPressed: () => onSavePressed(context),  // 함수에 context 전달
                   style: ElevatedButton.styleFrom(
                     foregroundColor: PRIMARY_COLOR,
                   ),
@@ -97,17 +100,18 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
     );
   }
 
-  void onSavePressed() async {
+  void onSavePressed(BuildContext context) async {
     // 저장 버튼 눌렀을 때 실행할 함수
     if (formKey.currentState!.validate()) {
       formKey.currentState!.save();
 
-      await GetIt.I<LocalDatabase>().createSchedule(  // 일정 생성하기
-        SchedulesCompanion(
-          startTime: Value(startTime!),
-          endTime: Value(endTime!),
-          content: Value(content!),
-          date: Value(widget.selectedDate),
+      context.read<ScheduleProvider>().createSchedule(
+        schedule: ScheduleModel(
+          id: 'new_model',
+          content: content!,
+          date: widget.selectedDate,
+          startTime: startTime!,
+          endTime: endTime!,
         ),
       );
 
@@ -116,7 +120,6 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
   }
   String? timeValidator(String? val) {
     // 시간값 검증
-    // TODO: String? 에서 물음표의 의미 찾아보기
     if (val == null) {
       return '값을 입력해주세요';
     }
