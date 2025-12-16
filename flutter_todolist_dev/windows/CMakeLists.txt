@@ -9,6 +9,9 @@ set(BINARY_NAME "flutter_todolist_dev")
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
 cmake_policy(VERSION 3.14...3.25)
+# Set CMAKE_POLICY_VERSION_MINIMUM to handle Firebase C++ SDK compatibility
+# This allows CMake to work with older minimum version requirements
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "Minimum CMake policy version" FORCE)
 
 # Define build configuration option.
 get_property(IS_MULTICONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
