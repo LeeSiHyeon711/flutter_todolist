@@ -29,7 +29,7 @@ class TodayBanner extends StatelessWidget {
               '${selectedDate.year}년 ${selectedDate.month}월 ${selectedDate.day}일',
               style: textStyle,
             ),
-            Text(  // 일정 갯수 표시시
+            Text(  // 일정 갯수 표시
               '$count개',
               style: textStyle,
             )

@@ -2,7 +2,6 @@ import 'package:TODO_APP_DEV/model/schedule_model.dart';
 import 'package:TODO_APP_DEV/repository/schedule_repository.dart';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class ScheduleProvider extends ChangeNotifier {

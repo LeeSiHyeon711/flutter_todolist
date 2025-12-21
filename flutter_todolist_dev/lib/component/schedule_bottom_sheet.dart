@@ -3,7 +3,8 @@ import 'package:TODO_APP_DEV/const/colors.dart';
 import 'package:TODO_APP_DEV/component/custom_text_field.dart';
 import 'package:TODO_APP_DEV/model/schedule_model.dart';
 import 'package:uuid/uuid.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import 'package:TODO_APP_DEV/provider/schedule_provider.dart';
 
 class ScheduleBottomSheet extends StatefulWidget {
   final DateTime selectedDate;
@@ -111,8 +112,9 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
         endTime: endTime!,
       );
 
-      // 스케줄 모델 파이어스토어에 삽입하기
-      await FirebaseFirestore.instance.collection('schedule',).doc(schedule.id).set(schedule.toJson());
+      // ScheduleProvider를 통해 일정 생성 (캐시 자동 업데이트)
+      final provider = context.read<ScheduleProvider>();
+      provider.createSchedule(schedule: schedule);
 
       Navigator.of(context).pop();  // 일정 생성 후 화면 뒤로 가기
     }
