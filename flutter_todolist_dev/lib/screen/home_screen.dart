@@ -6,6 +6,7 @@ import 'package:TODO_APP_DEV/component/schedule_bottom_sheet.dart';
 import 'package:TODO_APP_DEV/const/colors.dart';
 import 'package:provider/provider.dart';
 import 'package:TODO_APP_DEV/provider/schedule_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomeScreen extends StatelessWidget {
 
@@ -51,9 +52,19 @@ class HomeScreen extends StatelessWidget {
               onDaySelected(selectedDate, focusedDate, context),
             ),
             SizedBox(height: 8.0),
-            TodayBanner(
-              selectedDate: selectedDate,
-              count: schedules.length,
+            StreamBuilder<QuerySnapshot>(
+              // ListView에 적용했던 같은 쿼리
+              stream: FirebaseFirestore.instance
+                  .collection('schedule')
+                  .where('date', isEqualTo: '${selectedDate.year}${selectedDate.month.toString().padLeft(2, '0')}${selectedDate.day.toString().padLeft(2, '0')}')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                return TodayBanner(
+                  selectedDate: selectedDate,
+                  // 개수 가져오기
+                  count: snapshot.data?.docs.length ?? 0,
+                );
+              },
             ),
             SizedBox(height: 8.0),
             Expanded(
@@ -65,7 +76,11 @@ class HomeScreen extends StatelessWidget {
                     key: ObjectKey(schedule.id),
                     direction: DismissDirection.startToEnd,
                     onDismissed: (DismissDirection direction) {
-                      provider.deleteSchedule(date: selectedDate, id: schedule.id);
+                      // 특정 문서 삭제하기
+                      FirebaseFirestore.instance
+                      .collection('schedule')
+                      .doc(schedule.id)
+                      .delete();
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(
@@ -90,6 +105,6 @@ class HomeScreen extends StatelessWidget {
   void onDaySelected(DateTime selectedDate, DateTime focusedDate, BuildContext context) {
     final provider = context.read<ScheduleProvider>();
     provider.changeSelectedDate(date: selectedDate,);
-    provider.getSchedules(date: selectedDate);
+    provider.scheduleRepository.getSchedules(date: selectedDate);
   }
 }
