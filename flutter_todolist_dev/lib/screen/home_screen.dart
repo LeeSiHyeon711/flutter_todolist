@@ -6,9 +6,30 @@ import 'package:TODO_APP_DEV/component/schedule_bottom_sheet.dart';
 import 'package:TODO_APP_DEV/const/colors.dart';
 import 'package:provider/provider.dart';
 import 'package:TODO_APP_DEV/provider/schedule_provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  DateTime selectedDate = DateTime.utc(
+    DateTime.now().year,
+    DateTime.now().month,
+    DateTime.now().day,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+
+    // HomeScreen 위젯이 생성되면 오늘 날짜의 일정을 바로 요청합니다.
+    context.read<ScheduleProvider>().getSchedules(
+      date: selectedDate,
+      accessToken: context.read<ScheduleProvider>().accessToken!,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,19 +73,10 @@ class HomeScreen extends StatelessWidget {
               onDaySelected(selectedDate, focusedDate, context),
             ),
             SizedBox(height: 8.0),
-            StreamBuilder<QuerySnapshot>(
-              // ListView에 적용했던 같은 쿼리
-              stream: FirebaseFirestore.instance
-                  .collection('schedule')
-                  .where('date', isEqualTo: '${selectedDate.year}${selectedDate.month.toString().padLeft(2, '0')}${selectedDate.day.toString().padLeft(2, '0')}')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                return TodayBanner(
-                  selectedDate: selectedDate,
-                  // 개수 가져오기
-                  count: snapshot.data?.docs.length ?? 0,
-                );
-              },
+            TodayBanner(
+              selectedDate: selectedDate,
+              // provider의 cache에서 일정 개수 가져오기
+              count: schedules.length,
             ),
             SizedBox(height: 8.0),
             Expanded(
@@ -76,11 +88,12 @@ class HomeScreen extends StatelessWidget {
                     key: ObjectKey(schedule.id),
                     direction: DismissDirection.startToEnd,
                     onDismissed: (DismissDirection direction) {
-                      // 특정 문서 삭제하기
-                      FirebaseFirestore.instance
-                      .collection('schedule')
-                      .doc(schedule.id)
-                      .delete();
+                      // ScheduleProvider를 통해 일정 삭제하기
+                      provider.deleteSchedule(
+                        date: selectedDate,
+                        id: schedule.id,
+                        accessToken: provider.accessToken!,
+                      );
                     },
                     child: Padding(
                       padding: const EdgeInsets.only(
@@ -105,6 +118,6 @@ class HomeScreen extends StatelessWidget {
   void onDaySelected(DateTime selectedDate, DateTime focusedDate, BuildContext context) {
     final provider = context.read<ScheduleProvider>();
     provider.changeSelectedDate(date: selectedDate,);
-    provider.scheduleRepository.getSchedules(date: selectedDate);
+    provider.getSchedules(date: selectedDate, accessToken: provider.accessToken!);
   }
 }

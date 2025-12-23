@@ -1,49 +1,68 @@
 import 'dart:async';
 import 'package:TODO_APP_DEV/model/schedule_model.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
+import 'dart:io';
 
 class ScheduleRepository {
-  final _firestore = FirebaseFirestore.instance;
-  final _collection = 'schedule';
+  final _dio = Dio();
+  final _targetUrl = 'http://${Platform.isAndroid ? '10.0.2.2' : 'localhost'}:3000/schedule';
 
   Future<List<ScheduleModel>> getSchedules({
+    required String accessToken,
     required DateTime date,
   }) async {
-    // 날짜를 YYYYMMDD 형식으로 변환
-    final dateString = '${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}';
+    final resp = await _dio.get(
+      _targetUrl,
+      queryParameters: {
+        'date':
+        '${date.year}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}',
+      },
+      options: Options(
+        headers: {
+          'authorization': 'Bearer $accessToken',
+        },
+      ),
+    );
     
-    // Firestore에서 해당 날짜의 일정 조회
-    final querySnapshot = await _firestore
-        .collection(_collection)
-        .where('date', isEqualTo: dateString)
-        .get();
-
-    return querySnapshot.docs
-        .map((doc) => ScheduleModel.fromJson(json: doc.data()))
-        .toList();
+    if (resp.data is! List) {
+      return [];
+    }
+    
+    return List<ScheduleModel>.from(
+      (resp.data as List).map((x) => ScheduleModel.fromJson(json: x as Map<String, dynamic>)),
+    );
   }
 
-  Future<String> createSchedule({
+  Future<String?> createSchedule({
     required ScheduleModel schedule,
+    required String accessToken,
   }) async {
-    // Firestore에 일정 추가
-    await _firestore
-        .collection(_collection)
-        .doc(schedule.id)
-        .set(schedule.toJson());
-
-    return schedule.id;
+    final json = schedule.toJson();
+    final resp = await _dio.post(
+      _targetUrl,
+      data: json,
+      options: Options(
+        headers: {
+          'authorization': 'Bearer $accessToken',
+        },
+      ),
+    );
+    return resp.data?['id'] as String?;
   }
 
-  Future<String> deleteSchedule({
+  Future<String?> deleteSchedule({
+    required String accessToken,
     required String id,
   }) async {
-    // Firestore에서 일정 삭제
-    await _firestore
-        .collection(_collection)
-        .doc(id)
-        .delete();
-
-    return id;
+    final resp = await _dio.delete(
+      _targetUrl,
+      data: {'id': id},
+      options: Options(
+        headers: {
+          'authorization': 'Bearer $accessToken',
+        },
+      ),
+    );
+    return resp.data?['id'] as String?;
   }
 }

@@ -114,7 +114,7 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
 
       // ScheduleProvider를 통해 일정 생성 (캐시 자동 업데이트)
       final provider = context.read<ScheduleProvider>();
-      provider.createSchedule(schedule: schedule);
+      provider.createSchedule(schedule: schedule, accessToken: provider.accessToken!);
 
       Navigator.of(context).pop();  // 일정 생성 후 화면 뒤로 가기
     }

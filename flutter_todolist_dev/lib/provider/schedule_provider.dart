@@ -24,8 +24,18 @@ class ScheduleProvider extends ChangeNotifier {
     required this.authRepository,
   }) : super() {}
 
+  void getSchedules({
+    required DateTime date,
+    required String accessToken,
+  }) async {
+    final schedules = await scheduleRepository.getSchedules(date: date, accessToken: accessToken);
+    cache[date] = schedules;
+    notifyListeners();
+  }
+
   void createSchedule({
     required ScheduleModel schedule,
+    required String accessToken,
   }) async {
     final targetDate = schedule.date;
 
@@ -54,7 +64,7 @@ class ScheduleProvider extends ChangeNotifier {
 
     try {
       // API 요청을 합니다.
-      final savedSchedule = await scheduleRepository.createSchedule(schedule: schedule);
+      final savedSchedule = await scheduleRepository.createSchedule(schedule: schedule, accessToken: accessToken);
 
       cache.update(
         targetDate,
@@ -74,6 +84,7 @@ class ScheduleProvider extends ChangeNotifier {
   void deleteSchedule({
     required DateTime date,
     required String id,
+    required String accessToken,
   }) async {
     final targetSchedule = cache[date]!.firstWhere((e) => e.id == id);  // 삭제할 일정 기억
 
@@ -86,7 +97,7 @@ class ScheduleProvider extends ChangeNotifier {
     notifyListeners();  // 캐시 업데이트 반영하기
 
     try {
-      await scheduleRepository.deleteSchedule(id: id);  // 삭제 함수 실행
+      await scheduleRepository.deleteSchedule(accessToken: accessToken, id: id);  // 삭제 함수 실행
     } catch (e) {
       // 삭제 실패 시 캐시 롤백하기
       cache.update(
