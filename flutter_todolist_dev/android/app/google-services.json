@@ -12,7 +12,20 @@
           "package_name": "com.example.flutter_todolist_dev"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1047247760638-e0dc2socd40trnnesgm0ldo9jrjr4a8m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutter_todolist_dev",
+            "certificate_hash": "9ab2e9b20f1bc625a458a9f9e5826561a3b08513"
+          }
+        },
+        {
+          "client_id": "1047247760638-1sadm0ts6k9o0h0mmjupvga8b6bc6imr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDZiszcvhi7yKG2ZeiVIU-A4OuXYhqiXMU"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1047247760638-1sadm0ts6k9o0h0mmjupvga8b6bc6imr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1047247760638-k9ag4gna5b9uuk5bpkuiciqh7eppb65l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.flutterTodolistDev"
+              }
+            }
+          ]
         }
       }
     }

@@ -3,6 +3,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:TODO_APP_DEV/firebase_options.dart';
 import 'package:TODO_APP_DEV/screen/auth_screen.dart';
+import 'package:TODO_APP_DEV/screen/auth_login_screen.dart';
 import 'package:TODO_APP_DEV/repository/auth_repository.dart';
 import 'package:TODO_APP_DEV/repository/schedule_repository.dart';
 import 'package:TODO_APP_DEV/provider/schedule_provider.dart';
@@ -30,7 +31,7 @@ void main() async {
       create: (_) => scheduleProvider,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: AuthScreen(),
+        home: AuthLoginScreen(),
       ),
     ),
   );

@@ -24,11 +24,19 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    // HomeScreen 위젯이 생성되면 오늘 날짜의 일정을 바로 요청합니다.
-    context.read<ScheduleProvider>().getSchedules(
-      date: selectedDate,
-      accessToken: context.read<ScheduleProvider>().accessToken!,
-    );
+    // HomeScreen 위젯이 완전히 빌드된 후에 일정을 요청합니다.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<ScheduleProvider>();
+      final token = provider.accessToken;
+      
+      // accessToken이 있을 때만 일정을 요청합니다.
+      if (token != null) {
+        provider.getSchedules(
+          date: selectedDate,
+          accessToken: token,
+        );
+      }
+    });
   }
 
   @override
@@ -60,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         child: Icon(
           Icons.add,
+          color: Colors.white,
         ),
       ),
       body: SafeArea(     // 시스템 UI 피해서 구현하기
