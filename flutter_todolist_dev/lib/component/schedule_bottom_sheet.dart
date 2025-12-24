@@ -5,6 +5,8 @@ import 'package:TODO_APP_DEV/model/schedule_model.dart';
 import 'package:uuid/uuid.dart';
 import 'package:provider/provider.dart';
 import 'package:TODO_APP_DEV/provider/schedule_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ScheduleBottomSheet extends StatefulWidget {
   final DateTime selectedDate;
@@ -112,11 +114,29 @@ class _ScheduleBottomSheetState extends State<ScheduleBottomSheet> {
         endTime: endTime!,
       );
 
-      // ScheduleProvider를 통해 일정 생성 (캐시 자동 업데이트)
-      final provider = context.read<ScheduleProvider>();
-      provider.createSchedule(schedule: schedule, accessToken: provider.accessToken!);
+      // 현재 로그인한 사용자 정보를 가져옵니다.
+      final user = FirebaseAuth.instance.currentUser;
 
-      Navigator.of(context).pop();  // 일정 생성 후 화면 뒤로 가기
+      // 만약 로그인한 사용자 정보를 가져오지 못한다면 다시 로그인을 요청합니다.
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:Text('다시 로그인을 해주세요.'),
+          ),
+        );
+        Navigator.of(context).pop();
+
+        return;
+      }
+
+      await FirebaseFirestore.instance.collection('schedule',)
+      .doc(schedule.id).set(
+        {
+          ...schedule.toJson(),
+          'author': user.email,
+        },
+      );
+      Navigator.of(context).pop();
     }
   }
   String? timeValidator(String? val) {

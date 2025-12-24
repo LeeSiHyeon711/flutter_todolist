@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:TODO_APP_DEV/const/colors.dart';
 import 'package:TODO_APP_DEV/provider/schedule_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class TodayBanner extends StatelessWidget {
   final DateTime selectedDate;  // 선택된 날짜
@@ -41,9 +43,13 @@ class TodayBanner extends StatelessWidget {
                 const SizedBox(width: 8.0),
                 // 아이콘 눌렀을 때 로그아웃 진행
                 GestureDetector(
-                  onTap: () {
-                    provider.logout();
+                  onTap: () async {
+                    // 구글 로그인/로그아웃
+                    await GoogleSignIn().signOut();
+                    // 파이어베이스 인증 로그아웃 함수
+                    await FirebaseAuth.instance.signOut();
 
+                    // 홈 스크린으로 돌아가기
                     Navigator.of(context).pop();
                   },
                   child: Icon(
