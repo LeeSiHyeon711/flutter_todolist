@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:TODO_APP_DEV/const/colors.dart';
-import 'package:TODO_APP_DEV/provider/schedule_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -17,7 +15,6 @@ class TodayBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<ScheduleProvider>();
     final textStyle = TextStyle(
       fontWeight: FontWeight.w600,
       color: Colors.white,

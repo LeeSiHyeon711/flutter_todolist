@@ -9,6 +9,9 @@ import 'package:TODO_APP_DEV/component/schedule_bottom_sheet.dart';
 import 'package:TODO_APP_DEV/const/colors.dart';
 
 class HomeScreen extends StatefulWidget {
+  final String? userEmail; // 웹에서 이메일 전달용
+
+  const HomeScreen({Key? key, this.userEmail}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -21,8 +24,21 @@ class _HomeScreenState extends State<HomeScreen> {
     DateTime.now().day,
   );
 
+  String? get userEmail {
+    return widget.userEmail ?? FirebaseAuth.instance.currentUser?.email;
+  }
+
   @override
   Widget build(BuildContext context) {
+    // 이메일이 없으면 로그인 화면으로 리다이렉트
+    if (userEmail == null) {
+      return Scaffold(
+        body: Center(
+          child: Text('로그인이 필요합니다.'),
+        ),
+      );
+    }
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         // ➊ 새 일정 버튼
@@ -65,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 'date',
                 isEqualTo: '${selectedDate.year}${selectedDate.month.toString().padLeft(2, "0")}${selectedDate.day.toString().padLeft(2, "0")}',
               )
-                  .where('author', isEqualTo: FirebaseAuth.instance.currentUser!.email)
+                  .where('author', isEqualTo: userEmail)
                   .snapshots(),
               builder: (context, snapshot) {
                 return TodayBanner(
@@ -88,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   'date',
                   isEqualTo: '${selectedDate.year}${selectedDate.month.toString().padLeft(2, "0")}${selectedDate.day.toString().padLeft(2, "0")}',
                 )
-                    .where('author', isEqualTo: FirebaseAuth.instance.currentUser!.email)
+                    .where('author', isEqualTo: userEmail)
                     .snapshots(),
                 builder: (context, snapshot) {
                   // Stream을 가져오는 동안 에러가 났을 때 보여줄 화면

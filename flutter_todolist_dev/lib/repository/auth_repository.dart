@@ -1,12 +1,22 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 
 class AuthRepository {
   // Dio 인스턴스 생성
   final _dio = Dio();
   // 서버 주소
-  final _targetUrl = 'http://${Platform.isAndroid ? '10.0.2.2' : 'localhost'}:3000/auth';
+  final _targetUrl = 'http://${_getHost()}:3000/auth';
+  
+  static String _getHost() {
+    if (kIsWeb) {
+      return 'localhost';
+    }
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return '10.0.2.2';
+    }
+    return 'localhost';
+  }
 
   // 회원가입 로직
   Future<({String refreshToken, String accessToken})> register({

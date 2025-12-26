@@ -3,8 +3,6 @@ import 'package:TODO_APP_DEV/const/colors.dart';
 import 'package:TODO_APP_DEV/component/custom_text_field.dart';
 import 'package:TODO_APP_DEV/model/schedule_model.dart';
 import 'package:uuid/uuid.dart';
-import 'package:provider/provider.dart';
-import 'package:TODO_APP_DEV/provider/schedule_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 

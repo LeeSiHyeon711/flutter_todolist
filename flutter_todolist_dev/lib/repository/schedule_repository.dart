@@ -1,11 +1,21 @@
 import 'dart:async';
 import 'package:TODO_APP_DEV/model/schedule_model.dart';
 import 'package:dio/dio.dart';
-import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 
 class ScheduleRepository {
   final _dio = Dio();
-  final _targetUrl = 'http://${Platform.isAndroid ? '10.0.2.2' : 'localhost'}:3000/schedule';
+  final _targetUrl = 'http://${_getHost()}:3000/schedule';
+  
+  static String _getHost() {
+    if (kIsWeb) {
+      return 'localhost';
+    }
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      return '10.0.2.2';
+    }
+    return 'localhost';
+  }
 
   Future<List<ScheduleModel>> getSchedules({
     required String accessToken,
