@@ -7,6 +7,7 @@ import 'package:TODO_APP_DEV/component/schedule_card.dart';
 import 'package:TODO_APP_DEV/component/today_banner.dart';
 import 'package:TODO_APP_DEV/component/schedule_bottom_sheet.dart';
 import 'package:TODO_APP_DEV/const/colors.dart';
+import 'package:TODO_APP_DEV/component/banner_ad_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   final String? userEmail; // 웹에서 이메일 전달용
@@ -59,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
           color: Colors.white,
         ),
       ),
+      floatingActionButtonLocation: _CustomFloatingActionButtonLocation(),
       body: SafeArea(
         // 시스템 UI 피해서 UI 구현하기
         child: Column(
@@ -94,63 +96,67 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SizedBox(height: 8.0),
             Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                // ➊ 파이어스토어로부터 일정 정보 받아오기
-                stream: FirebaseFirestore.instance
-                    .collection(
-                  'schedule',
-                )
-                    .where(
-                  'date',
-                  isEqualTo: '${selectedDate.year}${selectedDate.month.toString().padLeft(2, "0")}${selectedDate.day.toString().padLeft(2, "0")}',
-                )
-                    .where('author', isEqualTo: userEmail)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  // Stream을 가져오는 동안 에러가 났을 때 보여줄 화면
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text('일정 정보를 가져오지 못했습니다.'),
-                    );
-                  }
-
-                  // 로딩 중일 때 보여줄 화면
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Container();
-                  }
-
-                  // ➋ ScheduleModel로 데이터 매핑하기
-                  final schedules = snapshot.data!.docs
-                      .map(
-                        (QueryDocumentSnapshot e) => ScheduleModel.fromJson(json: (e.data() as Map<String, dynamic>)),
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 91.0), // 광고 영역(75px) + FloatingActionButton 여백(16px) 높이만큼 하단 패딩
+                child: StreamBuilder<QuerySnapshot>(
+                  // ➊ 파이어스토어로부터 일정 정보 받아오기
+                  stream: FirebaseFirestore.instance
+                      .collection(
+                    'schedule',
                   )
-                      .toList();
-
-                  return ListView.builder(
-                    itemCount: schedules.length,
-                    itemBuilder: (context, index) {
-                      final schedule = schedules[index];
-
-                      return Dismissible(
-                        key: ObjectKey(schedule.id),
-                        direction: DismissDirection.startToEnd,
-                        onDismissed: (DismissDirection direction) {
-                          FirebaseFirestore.instance.collection('schedule').doc(schedule.id).delete();
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
-                          child: ScheduleCard(
-                            startTime: schedule.startTime,
-                            endTime: schedule.endTime,
-                            content: schedule.content,
-                          ),
-                        ),
+                      .where(
+                    'date',
+                    isEqualTo: '${selectedDate.year}${selectedDate.month.toString().padLeft(2, "0")}${selectedDate.day.toString().padLeft(2, "0")}',
+                  )
+                      .where('author', isEqualTo: userEmail)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    // Stream을 가져오는 동안 에러가 났을 때 보여줄 화면
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text('일정 정보를 가져오지 못했습니다.'),
                       );
-                    },
-                  );
-                },
+                    }
+
+                    // 로딩 중일 때 보여줄 화면
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Container();
+                    }
+
+                    // ➋ ScheduleModel로 데이터 매핑하기
+                    final schedules = snapshot.data!.docs
+                        .map(
+                          (QueryDocumentSnapshot e) => ScheduleModel.fromJson(json: (e.data() as Map<String, dynamic>)),
+                    )
+                        .toList();
+
+                    return ListView.builder(
+                      itemCount: schedules.length,
+                      itemBuilder: (context, index) {
+                        final schedule = schedules[index];
+
+                        return Dismissible(
+                          key: ObjectKey(schedule.id),
+                          direction: DismissDirection.startToEnd,
+                          onDismissed: (DismissDirection direction) {
+                            FirebaseFirestore.instance.collection('schedule').doc(schedule.id).delete();
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0, left: 8.0, right: 8.0),
+                            child: ScheduleCard(
+                              startTime: schedule.startTime,
+                              endTime: schedule.endTime,
+                              content: schedule.content,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ),
+            BannerAdWidget(),
           ],
         ),
       ),
@@ -165,5 +171,18 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       this.selectedDate = selectedDate;
     });
+  }
+}
+
+class _CustomFloatingActionButtonLocation extends FloatingActionButtonLocation {
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    // 광고 영역 높이(75px) + 여백(45px) = 120px만큼 위로 올림
+    final double bottom = 120.0;
+    final double right = 16.0;
+    return Offset(
+      scaffoldGeometry.scaffoldSize.width - right - scaffoldGeometry.floatingActionButtonSize.width,
+      scaffoldGeometry.scaffoldSize.height - bottom - scaffoldGeometry.floatingActionButtonSize.height,
+    );
   }
 }

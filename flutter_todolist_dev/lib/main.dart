@@ -12,8 +12,14 @@ import 'package:TODO_APP_DEV/repository/auth_repository.dart';
 import 'package:TODO_APP_DEV/repository/schedule_repository.dart';
 import 'package:TODO_APP_DEV/provider/schedule_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // 광고 기능 초기화하기
+  MobileAds.instance.initialize();
+  
   // runZonedGuarded로 전체 앱을 감싸서 예외 처리
   runZonedGuarded(
     () async {
